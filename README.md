@@ -3,6 +3,7 @@ This package uses Rcpp to connect R to the [Tableau SDK](https://onlinehelp.tabl
 
 The Tableau SDK functionalities are implemented in this package as two R functions:
 - `write_tde`: Take a R data.frame and output it as a Tableau Data Extract (.tde) file
+- `write_twbx`: Take a R data.frame and update a Tableau Data Workbook (.twbx) file
 - `publish_tde`: Publish a .tde file to a Tableau Server
 
 ## Set-up

@@ -2,5 +2,6 @@
 
 export(publish_tde)
 export(write_tde)
+export(write_twbx)
 import(Rcpp)
 useDynLib(rtableau)
