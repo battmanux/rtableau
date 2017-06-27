@@ -31,29 +31,49 @@
 #' write_tde(iris, "iris.tde")
 #'
 write_tde <- function(df, filename, append = FALSE) {
+  if (Sys.getenv("RSTUDIO") == "1") {
+    write_tde_rstudio(df, filename, append)
+  } else {
+    write_tde_shell(df, filename, append)
+  }
+}
+
+write_tde_shell <- function(df, filename, append = FALSE) {
   if (!append & file.exists(filename)) file.remove(filename)
+    
+    # helper functions for types
+    is.POSIXct <- function(x) inherits(x, "POSIXct")
+    is.POSIXlt <- function(x) inherits(x, "POSIXlt")
+    is.Date <- function(x) inherits(x, "Date")
+    
+    # convert factors to strings
+    factorCols <- sapply(df, is.factor)
+    df[factorCols] <- lapply(df[factorCols], as.character)
+    
+    # convert posixlt to posixct
+    posixltCols <- sapply(df, is.POSIXlt)
+    df[posixltCols] <- lapply(df[posixltCols], as.POSIXct)
+    
+    # create a list of desired tableau types based on current R types
+    colTypes <- rep('CharString', ncol(df))
+    colTypes[sapply(df, is.double)] <- 'Double'
+    colTypes[sapply(df, is.integer)] <- 'Integer'
+    colTypes[sapply(df, is.logical)] <- 'Boolean'
+    colTypes[sapply(df, is.Date)] <- 'Date'
+    colTypes[sapply(df, is.POSIXct)] <- 'DateTime'
+    
+    .Call('rtableau_WriteTDE', PACKAGE = 'rtableau', df, colTypes, filename)
+    invisible(NULL)
+    
+}
 
-  # helper functions for types
-  is.POSIXct <- function(x) inherits(x, "POSIXct")
-  is.POSIXlt <- function(x) inherits(x, "POSIXlt")
-  is.Date <- function(x) inherits(x, "Date")
-
-  # convert factors to strings
-  factorCols <- sapply(df, is.factor)
-  df[factorCols] <- lapply(df[factorCols], as.character)
-
-  # convert posixlt to posixct
-  posixltCols <- sapply(df, is.POSIXlt)
-  df[posixltCols] <- lapply(df[posixltCols], as.POSIXct)
-
-  # create a list of desired tableau types based on current R types
-  colTypes <- rep('CharString', ncol(df))
-  colTypes[sapply(df, is.double)] <- 'Double'
-  colTypes[sapply(df, is.integer)] <- 'Integer'
-  colTypes[sapply(df, is.logical)] <- 'Boolean'
-  colTypes[sapply(df, is.Date)] <- 'Date'
-  colTypes[sapply(df, is.POSIXct)] <- 'DateTime'
-
-  .Call('rtableau_WriteTDE', PACKAGE = 'rtableau', df, colTypes, filename)
+write_tde_rstudio <- function(df, filename, append=F) {
+  l_rds_file <- tempfile(fileext = ".RDS")
+  saveRDS(df, l_rds_file)
+  system(
+    paste0('Rscript -e "l_df <- readRDS(\'',l_rds_file,'\'); rtableau:::write_tde_shell(l_df, \'',filename,'\',',append,')"')
+  )
+  unlink(l_rds_file)
   invisible(NULL)
 }
+
