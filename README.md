@@ -19,7 +19,6 @@ Binary executable: `/usr/local/bin/tdeserver64`
 `/Library/Frameworks`
 
 ## Known Issues
-- The Tableau SDK spawns other processes. **This can cause havoc with GUIs such as RStudio.** Therefore rtableau should only be used in console R.
 - There are some issues with the 9.3 SDK on Linux when using large datasets, I recommend using the 9.2 version of the SDK which is more stable.
 - The Tableau SDK does not support SSL on Linux for publishing
 
@@ -39,3 +38,5 @@ POSIXct | NumericVector| DateTime
 POSIXlt | NumericVector|  DateTime
 
 We convert factors to character in R, as well as POSIXlt to POSIXct.
+
+character and factor levels are converted to UTF-8 with protection for brocken characters
