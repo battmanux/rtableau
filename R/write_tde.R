@@ -46,6 +46,16 @@ write_tde_shell <- function(df, filename, append = FALSE) {
     is.POSIXlt <- function(x) inherits(x, "POSIXlt")
     is.Date <- function(x) inherits(x, "Date")
     
+    # Protect character agains non UTF-8 chars
+    charCols <- sapply(df, is.character)
+    df[charCols] <- lapply(df[charCols], function(x)  iconv(x, to = "utf8", sub = "byte") ) 
+    
+    # Protect levels agains non UTF-8 chars
+    factorCols <- sapply(df, is.factor)
+    for (l_col in names(factorCols[factorCols]) ) {
+      levels(df[[l_col]]) <- iconv(levels(df[[l_col]]), to = "utf8", sub = "byte")
+    }
+    
     # convert factors to strings
     factorCols <- sapply(df, is.factor)
     df[factorCols] <- lapply(df[factorCols], as.character)
