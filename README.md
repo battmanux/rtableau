@@ -14,6 +14,7 @@ I've only tested this on Mac and Linux, here's where my SDK files are installed.
 #### Linux  
 Shared object files: `/usr/lib64/tableausdk/`  
 Binary executable: `/usr/local/bin/tdeserver64` 
+You may need to link  ln -s libpcre16.so libpcre16.so.0 in /usr/lib/x86_64-linux-gnu (I have to do it in ubuntu 16.04)
 
 #### Mac  
 `/Library/Frameworks`
