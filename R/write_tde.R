@@ -47,8 +47,10 @@ write_tde_shell <- function(df, filename, append = FALSE) {
     is.Date <- function(x) inherits(x, "Date")
     
     # Protect character agains non UTF-8 chars
+    names(df) <- iconv(names(df), to = "utf8", sub = "byte")
+    
     charCols <- sapply(df, is.character)
-    df[charCols] <- lapply(df[charCols], function(x)  iconv(x, to = "utf8", sub = "byte") ) 
+    df[charCols] <- lapply(df[charCols], function(x)  iconv(x, to = "latin1", sub = "byte") ) 
     
     # Protect levels agains non UTF-8 chars
     factorCols <- sapply(df, is.factor)
